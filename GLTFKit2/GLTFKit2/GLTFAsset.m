@@ -31,6 +31,12 @@
     @catch (NSException *exception) {
         exceptionHandler(exception);
     }
+    @catch (NSError *error) {
+        exceptionHandler([NSException exceptionWithName:error.domain reason:error.localizedDescription userInfo:error.userInfo]);
+    }
+    @catch (...) {
+        exceptionHandler([NSException exceptionWithName:@"UnknownException" reason:@"An unknown exception was thrown" userInfo:nil]);
+    }
 }
 @end
 
