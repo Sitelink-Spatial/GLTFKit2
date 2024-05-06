@@ -35,4 +35,6 @@ rm -rf $archiveDirectory
 
 zip -r GLTFKit2.xcframework.zip GLTFKit2.xcframework
 
-swift package compute-checksum GLTFKit2.xcframework.zip
+swift package compute-checksum GLTFKit2.xcframework.zip > GLTFKit2.xcframework.zip.checksum
+
+rm -rf $outputDirectory

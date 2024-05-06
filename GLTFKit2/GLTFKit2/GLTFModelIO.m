@@ -1,6 +1,14 @@
 
 #import "GLTFModelIO.h"
 
+#undef assert
+#define assert(expression) do { \
+    if (!(expression)) { \
+        NSString *description = [NSString stringWithFormat:@"%s:%d: %s", __FILE__, __LINE__, #expression]; \
+        @throw [NSException exceptionWithName:@"AssertionFailureException" reason:description userInfo:nil]; \
+    } \
+} while(0)
+
 @interface MDLTextureFilter (GLTFCopyingExtensions)
 - (id)GLTF_copy;
 @end

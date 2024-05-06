@@ -7,6 +7,14 @@
 #include <cmath>
 #include <queue>
 
+#undef assert
+#define assert(expression) do { \
+    if (!(expression)) { \
+        NSString *description = [NSString stringWithFormat:@"%s:%d: %s", __FILE__, __LINE__, #expression]; \
+        @throw [NSException exceptionWithName:@"AssertionFailureException" reason:description userInfo:nil]; \
+    } \
+} while(0)
+
 namespace {
 
 #if _LIBCPP_STD_VER < 17

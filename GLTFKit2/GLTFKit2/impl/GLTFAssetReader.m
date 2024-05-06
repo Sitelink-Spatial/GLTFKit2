@@ -5,6 +5,14 @@
 #define CGLTF_IMPLEMENTATION
 #import "cgltf.h"
 
+#undef assert
+#define assert(expression) do { \
+    if (!(expression)) { \
+        NSString *description = [NSString stringWithFormat:@"%s:%d: %s", __FILE__, __LINE__, #expression]; \
+        @throw [NSException exceptionWithName:@"AssertionFailureException" reason:description userInfo:nil]; \
+    } \
+} while(0)
+
 static NSString *const GLTFExtensionEXTMeshoptCompression = @"EXT_meshopt_compression";
 
 @interface GLTFUniqueNameGenerator : NSObject
