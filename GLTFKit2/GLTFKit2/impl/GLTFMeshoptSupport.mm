@@ -10,8 +10,7 @@
 #undef assert
 #define assert(expression) do { \
     if (!(expression)) { \
-        NSString *description = [NSString stringWithFormat:@"%s:%d: %s", __FILE__, __LINE__, #expression]; \
-        @throw [NSException exceptionWithName:@"AssertionFailureException" reason:description userInfo:nil]; \
+        return NO; \
     } \
 } while(0)
 
@@ -133,7 +132,7 @@ BOOL GLTFMeshoptDecodeVertexBuffer(const uint8_t *source, size_t sourceLength,
     return YES;
 }
 
-void GLTFMeshoptApplyFilter(uint8_t *destination, size_t elementCount, size_t stride,
+BOOL GLTFMeshoptApplyFilter(uint8_t *destination, size_t elementCount, size_t stride,
                             GLTFMeshoptCompressionFilter filter)
 {
     switch (filter) {
@@ -231,6 +230,7 @@ void GLTFMeshoptApplyFilter(uint8_t *destination, size_t elementCount, size_t st
         default:
             break;
     }
+    return YES;
 }
 
 template <typename DstInt_t>
@@ -398,8 +398,7 @@ BOOL GLTFMeshoptDecodeBufferView(GLTFBufferView *bufferView, uint8_t *destinatio
     switch (compression.mode) {
         case GLTFMeshoptCompressionModeAttributes: {
             if (GLTFMeshoptDecodeVertexBuffer(source, sourceLength, compression.count, compression.stride, destination)) {
-                GLTFMeshoptApplyFilter(destination, compression.count, compression.stride, compression.filter);
-                return YES;
+                return GLTFMeshoptApplyFilter(destination, compression.count, compression.stride, compression.filter);
             }
             break;
         }

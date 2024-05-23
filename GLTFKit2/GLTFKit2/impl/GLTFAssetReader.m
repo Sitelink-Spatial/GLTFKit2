@@ -8,8 +8,7 @@
 #undef assert
 #define assert(expression) do { \
     if (!(expression)) { \
-        NSString *description = [NSString stringWithFormat:@"%s:%d: %s", __FILE__, __LINE__, #expression]; \
-        @throw [NSException exceptionWithName:@"AssertionFailureException" reason:description userInfo:nil]; \
+        return NO; \
     } \
 } while(0)
 

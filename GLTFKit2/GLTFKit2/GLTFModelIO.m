@@ -4,8 +4,7 @@
 #undef assert
 #define assert(expression) do { \
     if (!(expression)) { \
-        NSString *description = [NSString stringWithFormat:@"%s:%d: %s", __FILE__, __LINE__, #expression]; \
-        @throw [NSException exceptionWithName:@"AssertionFailureException" reason:description userInfo:nil]; \
+        return NO; \
     } \
 } while(0)
 
@@ -252,7 +251,7 @@ size_t GLTFMDLSizeForVertexFormat(MDLVertexFormat format) {
     {
         return sizeof(UInt32) * (format & ComponentCountMask);
     }
-    assert(false);
+    //assert(false);
     return 0;
 }
 

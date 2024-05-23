@@ -9,8 +9,7 @@
 #undef assert
 #define assert(expression) do { \
     if (!(expression)) { \
-        NSString *description = [NSString stringWithFormat:@"%s:%d: %s", __FILE__, __LINE__, #expression]; \
-        @throw [NSException exceptionWithName:@"AssertionFailureException" reason:description userInfo:nil]; \
+        return NO; \
     } \
 } while(0)
 
@@ -688,7 +687,7 @@ static float GLTFLuminanceFromRGBA(simd_float4 rgba) {
     return (__bridge id)cgImage;
 }
 
-- (void)convertAsset {
+- (BOOL)convertAsset {
     NSMutableDictionary *properties = [NSMutableDictionary dictionary];
     properties[GLTFAssetPropertyKeyCopyright] = self.asset.copyright;
     properties[GLTFAssetPropertyKeyGenerator] = self.asset.generator;
@@ -1316,6 +1315,8 @@ static float GLTFLuminanceFromRGBA(simd_float4 rgba) {
     }
 
     [_materialPropertyContentsCache removeAllObjects];
+
+    return YES;
 }
 
 @end

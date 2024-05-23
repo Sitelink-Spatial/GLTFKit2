@@ -14,14 +14,6 @@
     #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #endif
 
-#undef assert
-#define assert(expression) do { \
-    if (!(expression)) { \
-        NSString *description = [NSString stringWithFormat:@"%s:%d: %s", __FILE__, __LINE__, #expression]; \
-        @throw [NSException exceptionWithName:@"AssertionFailureException" reason:description userInfo:nil]; \
-    } \
-} while(0)
-
 @implementation GLTFKit2Exec
 + (void)catchExceptions:(void (^)(void))closure
          withExceptionHandler:(void (^)(NSException *))exceptionHandler {
