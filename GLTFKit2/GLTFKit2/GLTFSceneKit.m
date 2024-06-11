@@ -949,6 +949,12 @@ static float GLTFLuminanceFromRGBA(simd_float4 rgba) {
                 // For primitive types not supported by SceneKit (line loops, line strips, triangle
                 // fans), we retopologize the primitive's indices. However, if they aren't present,
                 // we need to adjust the vertex data.
+                if (   [attribute.name isEqual:@"WEIGHTS_0"] 
+                    || [attribute.name isEqual:@"JOINTS_0"] 
+                    || [attribute.name hasPrefix:@"_"]) {
+                    // Omit joint indices and weights; these are stored later on the skinner
+                    continue;
+                }
                 [geometrySources addObject:GLTFSCNGeometrySourceForAccessor(attribute.accessor, attribute.name)];
             }
 

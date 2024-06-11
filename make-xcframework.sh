@@ -5,6 +5,8 @@ set -e # Exit on error
 
 moduleName="GLTFKit2"
 
+buildType="Release"
+
 outputDirectory="$(pwd;)/$moduleName.xcframework"
 
 archiveDirectoryName="archives"
@@ -12,15 +14,15 @@ archiveDirectory="$(pwd;)/$archiveDirectoryName"
 rm -rf $archiveDirectory
 rm -rf $outputDirectory
 
-xcodebuild archive -scheme $moduleName -archivePath "$archiveDirectory/iOS/$moduleName" \
+xcodebuild archive -scheme $moduleName -archivePath "$archiveDirectory/iOS/$moduleName" -configuration $buildType \
                    -destination "generic/platform=iOS" SKIP_INSTALL=NO  BUILD_LIBRARY_FOR_DISTRIBUTION=YES
-xcodebuild archive -scheme $moduleName -archivePath "$archiveDirectory/iOS_Simulator/$moduleName" \
+xcodebuild archive -scheme $moduleName -archivePath "$archiveDirectory/iOS_Simulator/$moduleName" -configuration $buildType \
                    -destination "generic/platform=iOS Simulator" SKIP_INSTALL=NO  BUILD_LIBRARY_FOR_DISTRIBUTION=YES
-xcodebuild archive -scheme $moduleName -archivePath "$archiveDirectory/macOS/$moduleName" \
+xcodebuild archive -scheme $moduleName -archivePath "$archiveDirectory/macOS/$moduleName" -configuration $buildType \
                    -destination "generic/platform=macOS" SKIP_INSTALL=NO  BUILD_LIBRARY_FOR_DISTRIBUTION=YES
-xcodebuild archive -scheme $moduleName -archivePath "$archiveDirectory/visionOS/$moduleName" \
+xcodebuild archive -scheme $moduleName -archivePath "$archiveDirectory/visionOS/$moduleName" -configuration $buildType \
                    -destination "generic/platform=visionOS" SKIP_INSTALL=NO  BUILD_LIBRARY_FOR_DISTRIBUTION=YES
-xcodebuild archive -scheme $moduleName -archivePath "$archiveDirectory/visionOS_Simulator/$moduleName" \
+xcodebuild archive -scheme $moduleName -archivePath "$archiveDirectory/visionOS_Simulator/$moduleName" -configuration $buildType \
                    -destination "generic/platform=visionOS Simulator" SKIP_INSTALL=NO  BUILD_LIBRARY_FOR_DISTRIBUTION=YES
 
 xcodebuild -create-xcframework \
