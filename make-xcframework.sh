@@ -5,7 +5,9 @@ set -e # Exit on error
 
 moduleName="GLTFKit2"
 
-buildType="Release"
+buildType="${1:-Release}"
+
+echo "Building $moduleName for $buildType"
 
 outputDirectory="$(pwd;)/$moduleName.xcframework"
 

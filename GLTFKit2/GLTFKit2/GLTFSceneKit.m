@@ -3,6 +3,7 @@
 #import "GLTFLogging.h"
 #import "GLTFWorkflowHelper.h"
 
+#import <objc/runtime.h>
 #import <SceneKit/ModelIO.h>
 #import <simd/simd.h>
 
@@ -12,6 +13,16 @@
         return NO; \
     } \
 } while(0)
+
+const void *GLTFKit2MetadataKey = &GLTFKit2MetadataKey;
+@implementation GLTFKit2Metadata
++ (void)setMetadata:(NSDictionary *)metadata forNode:(SCNNode *)node {
+    objc_setAssociatedObject(node, GLTFKit2MetadataKey, metadata, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
++ (NSDictionary *_Nullable)getMetadata:(SCNNode *)node {
+    return objc_getAssociatedObject(node, GLTFKit2MetadataKey);
+}
+@end
 
 NSString *const GLTFAssetPropertyKeyCopyright = @"GLTFAssetPropertyKeyCopyright";
 NSString *const GLTFAssetPropertyKeyGenerator = @"GLTFAssetPropertyKeyGenerator";
@@ -503,7 +514,7 @@ static SCNGeometrySource *GLTFSCNGeometrySourceForAccessor(GLTFAccessor *accesso
             }
         }
     }
-    
+
     // Prior to macOS 14.0 and iOS 17.0, hit-testing against nodes whose bone indices were in ushort format
     // did not work for GPU-skinned meshes. On older platforms, we transform from ushort indices to uchar
     // indices iff the transform is lossless (i.e., if all indices are < 256).
@@ -892,6 +903,7 @@ static float GLTFLuminanceFromRGBA(simd_float4 rgba) {
 
     NSMutableDictionary <NSUUID *, SCNGeometry *> *geometryForIdentifiers = [NSMutableDictionary dictionary];
     NSMutableDictionary <NSUUID *, SCNGeometryElement *> *geometryElementForIdentifiers = [NSMutableDictionary dictionary];
+    NSMutableDictionary <NSUUID *, NSMutableArray<NSString *> *> *metadata = [NSMutableDictionary dictionary];
     for (GLTFMesh *mesh in self.asset.meshes) {
         for (GLTFPrimitive *primitive in mesh.primitives) {
             int vertexCount = 0;
@@ -949,9 +961,14 @@ static float GLTFLuminanceFromRGBA(simd_float4 rgba) {
                 // For primitive types not supported by SceneKit (line loops, line strips, triangle
                 // fans), we retopologize the primitive's indices. However, if they aren't present,
                 // we need to adjust the vertex data.
-                if (   [attribute.name isEqual:@"WEIGHTS_0"] 
-                    || [attribute.name isEqual:@"JOINTS_0"] 
-                    || [attribute.name hasPrefix:@"_"]) {
+                if ([attribute.name hasPrefix:@"_"]) {
+                    if (metadata[attribute.name] == nil) {
+                        metadata[attribute.name] = [NSMutableArray array];
+                    }
+                    [metadata[attribute.name] addObject:attribute.accessor.identifier.UUIDString];
+                    continue;
+                } else if (   [attribute.name isEqual:@"WEIGHTS_0"]
+                           || [attribute.name isEqual:@"JOINTS_0"]) {
                     // Omit joint indices and weights; these are stored later on the skinner
                     continue;
                 }
@@ -1067,6 +1084,11 @@ static float GLTFLuminanceFromRGBA(simd_float4 rgba) {
         if (node.light) {
             NSInteger lightIndex = [self.asset.lights indexOfObject:node.light];
             scnNode.light = lights[lightIndex];
+        }
+
+        // Add metadata to scnNode
+        if (metadata.count > 0) {
+            [GLTFKit2Metadata setMetadata:metadata forNode:scnNode];
         }
 
         // This collection holds the nodes to which any skin on this node should be applied,

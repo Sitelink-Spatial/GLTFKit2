@@ -4,6 +4,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern const void *GLTFKit2MetadataKey;
+@interface GLTFKit2Metadata : NSObject
++ (void)setMetadata:(NSDictionary *)metadata forNode:(SCNNode *)node;
++ (NSDictionary *_Nullable)getMetadata:(SCNNode *)node;
+@end
+
 extern NSString *const GLTFAssetPropertyKeyCopyright;
 extern NSString *const GLTFAssetPropertyKeyGenerator;
 extern NSString *const GLTFAssetPropertyKeyVersion;
