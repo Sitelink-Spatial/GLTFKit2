@@ -965,7 +965,9 @@ static float GLTFLuminanceFromRGBA(simd_float4 rgba) {
                     if (metadata[attribute.name] == nil) {
                         metadata[attribute.name] = [NSMutableArray array];
                     }
-                    [metadata[attribute.name] addObject:attribute.accessor.identifier.UUIDString];
+                    NSData *sourceData = GLTFSCNPackedDataForAccessor(attribute.accessor);
+                    NSData *metacontent = GLTFSCNTransformPackedDataToFloat(sourceData, attribute.accessor);
+                    [metadata[attribute.name] addObject:metacontent];
                     continue;
                 } else if (   [attribute.name isEqual:@"WEIGHTS_0"]
                            || [attribute.name isEqual:@"JOINTS_0"]) {
