@@ -967,7 +967,7 @@ static float GLTFLuminanceFromRGBA(simd_float4 rgba) {
                     }
                     NSData *sourceData = GLTFSCNPackedDataForAccessor(attribute.accessor);
                     NSData *metacontent = GLTFSCNTransformPackedDataToFloat(sourceData, attribute.accessor);
-                    [metadata[attribute.name] addObject:metacontent];
+                    [metadata[attribute.name] addObject:@{@"data": metacontent}];
                     continue;
                 } else if (   [attribute.name isEqual:@"WEIGHTS_0"]
                            || [attribute.name isEqual:@"JOINTS_0"]) {
