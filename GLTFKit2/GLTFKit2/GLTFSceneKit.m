@@ -903,7 +903,7 @@ static float GLTFLuminanceFromRGBA(simd_float4 rgba) {
 
     NSMutableDictionary <NSUUID *, SCNGeometry *> *geometryForIdentifiers = [NSMutableDictionary dictionary];
     NSMutableDictionary <NSUUID *, SCNGeometryElement *> *geometryElementForIdentifiers = [NSMutableDictionary dictionary];
-    NSMutableDictionary <NSUUID *, NSMutableArray<NSString *> *> *metadata = [NSMutableDictionary dictionary];
+    NSMutableDictionary <NSUUID *, NSMutableDictionary *> *metadataForIdentifiers = [NSMutableDictionary dictionary];
     for (GLTFMesh *mesh in self.asset.meshes) {
         for (GLTFPrimitive *primitive in mesh.primitives) {
             int vertexCount = 0;
@@ -955,6 +955,7 @@ static float GLTFLuminanceFromRGBA(simd_float4 rgba) {
             SCNGeometryElement *element = GLTFSCNGeometryElementForIndexData(indexData, indexCount, indexSize, primitive);
             geometryElementForIdentifiers[primitive.identifier] = element;
 
+            NSMutableDictionary <NSUUID *, NSMutableArray<NSString *> *> *metadata = [NSMutableDictionary dictionary];
             NSMutableArray *geometrySources = [NSMutableArray arrayWithCapacity:primitive.attributes.count];
             for (GLTFAttribute *attribute in primitive.attributes) {
                 // TODO: Retopologize geometry source if geometry element's data is `nil`.
@@ -989,6 +990,7 @@ static float GLTFLuminanceFromRGBA(simd_float4 rgba) {
             geometry.name = mesh.name;
             geometry.firstMaterial = material ?: defaultMaterial;
             geometryForIdentifiers[primitive.identifier] = geometry;
+            metadataForIdentifiers[primitive.identifier] = metadata;
         }
     }
 
@@ -1088,11 +1090,6 @@ static float GLTFLuminanceFromRGBA(simd_float4 rgba) {
             scnNode.light = lights[lightIndex];
         }
 
-        // Add metadata to scnNode
-        if (metadata.count > 0) {
-            [GLTFKit2Metadata setMetadata:metadata forNode:scnNode];
-        }
-
         // This collection holds the nodes to which any skin on this node should be applied,
         // since we don't have a one-to-one mapping from nodes to meshes. It's also used to
         // apply morph targets to the correct primitives.
@@ -1115,6 +1112,12 @@ static float GLTFLuminanceFromRGBA(simd_float4 rgba) {
                 GLTFPrimitive *primitive = primitives[i];
                 SCNNode *geometryNode = geometryNodes[i];
                 geometryNode.geometry = geometryForIdentifiers[primitive.identifier];
+                NSDictionary *metadata = metadataForIdentifiers[primitive.identifier];
+
+                // Apply any metadata to the geometry node
+                if (metadata && metadata.count > 0) {
+                    [GLTFKit2Metadata setMetadata:metadata forNode:geometryNode];
+                }
 
                 if (primitive.targets.count > 0) {
                     // If the base mesh doesn't contain normals, use Model I/O to generate them
